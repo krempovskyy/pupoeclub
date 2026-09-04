@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PUPOE club</title>
+
+<!--
+  ============================================================
+  PUPOE club — как настроить сайт
+  ============================================================
+  Всё, что нужно менять, лежит в объекте CONFIG ниже (в <script>).
+
+  1. contractAddress — вставь адрес контракта (CA). Пока стоит заглушка.
+  2. ticker          — тикер. Пусто = показывается заглушка "$TBA".
+  3. network         — сеть. Сейчас "Robinhood".
+  4. gmgnUrl         — полная ссылка на страницу токена в GMGN.
+                       Пусто = кнопка ведёт на gmgn.ai.
+  5. dexEmbedUrl     — iframe-ссылка на DEX-график (напр. DexScreener embed:
+                       https://dexscreener.com/<chain>/<pair>?embed=1&theme=light ).
+                       Пусто = показывается заглушка, график можно подключить
+                       прямо на сайте.
+  6. Картинка        — положи файл art.png рядом с index.html
+                       (или поменяй src у <img id="art">).
+  7. soundUrl        — звук по клику на картинку (напр. "pop.mp3" рядом
+                       с index.html). Пусто = играет встроенный «поп».
+  8. Соцсети         — замени href="#" в шапке на свои ссылки.
+  ============================================================
+-->
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='90'%3E%E2%AD%90%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    color-scheme: light;
+    --green:      #a8e00c;
+    --green-2:    #c6f24a;
+    --green-soft: #e4fbb0;
+    --blue:       #35b6f2;
+    --blue-2:     #7ad2fa;
+    --blue-soft:  #cdeefd;
+    --ink:        #23324a;
+    --ink-soft:   #4c5c78;
+    --card:       #ffffff;
+    --shadow:     6px 6px 0 var(--ink);
+    --shadow-sm:  4px 4px 0 var(--ink);
+    --radius:     22px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    font-family:'Fredoka','Trebuchet MS',system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 500px at 15% -5%, var(--green-soft), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, var(--blue-soft), transparent 55%),
+      linear-gradient(135deg, #d9f58c 0%, #bfe9c9 45%, #bfe6fb 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* floating decorative stars */
+  .star-bg{ position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .star-bg svg{ position:absolute; opacity:.5; animation:float 9s ease-in-out infinite; }
+  .star-bg svg:nth-child(1){ top:12%;  left:6%;   width:46px;  animation-delay:0s;   color:var(--green); }
+  .star-bg svg:nth-child(2){ top:24%;  right:9%;  width:64px;  animation-delay:1.4s; color:var(--blue); }
+  .star-bg svg:nth-child(3){ top:62%;  left:4%;   width:38px;  animation-delay:2.6s; color:var(--blue); }
+  .star-bg svg:nth-child(4){ bottom:10%;right:6%;  width:56px;  animation-delay:.7s;  color:var(--green); }
+  .star-bg svg:nth-child(5){ top:44%;  right:3%;  width:30px;  animation-delay:3.3s; color:var(--green); }
+  .star-bg svg:nth-child(6){ bottom:24%;left:12%; width:44px;  animation-delay:2s;   color:var(--blue); }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) rotate(-6deg); }
+    50%    { transform:translateY(-22px) rotate(8deg); }
+  }
+
+  .wrap{ position:relative; z-index:1; max-width:1120px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter:blur(8px);
+    background:rgba(255,255,255,.6);
+    border-bottom:3px solid var(--ink);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding:12px 0;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-weight:700; font-size:22px; letter-spacing:.5px;
+    text-decoration:none; color:var(--ink);
+  }
+  .brand .dot{
+    width:26px; height:26px; border-radius:50%;
+    background:linear-gradient(135deg,var(--green),var(--blue));
+    border:3px solid var(--ink);
+  }
+  .socials{ display:flex; gap:10px; flex-wrap:wrap; }
+  .chip{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 14px; border:3px solid var(--ink); border-radius:999px;
+    background:var(--card); color:var(--ink);
+    font-weight:600; font-size:14px; text-decoration:none;
+    box-shadow:var(--shadow-sm);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .chip:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
+  .chip:active{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
+  .chip.green{ background:var(--green-2); }
+  .chip.blue { background:var(--blue-2); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    display:grid; grid-template-columns:1.1fr .9fr; gap:36px;
+    align-items:center; padding:56px 0 40px;
+  }
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 14px; border:3px solid var(--ink); border-radius:999px;
+    background:var(--card); font-weight:600; font-size:14px;
+    box-shadow:var(--shadow-sm);
+  }
+  h1{
+    margin:16px 0 10px;
+    font-size:clamp(44px, 8vw, 84px);
+    line-height:.98; font-weight:700; letter-spacing:1px;
+    background:linear-gradient(135deg,var(--green) 0%, var(--blue) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    -webkit-text-stroke:3px var(--ink);
+    paint-order:stroke fill;
+    text-shadow:var(--shadow);
+  }
+  .tagline{ font-size:19px; color:var(--ink-soft); max-width:46ch; margin:0 0 22px; }
+
+  .ticker-badge{
+    display:inline-flex; align-items:baseline; gap:8px;
+    padding:10px 18px; border:3px solid var(--ink); border-radius:16px;
+    background:var(--green-2); box-shadow:var(--shadow-sm);
+    font-weight:700; font-size:20px; margin-bottom:22px;
+  }
+  .ticker-badge span.lbl{ font-size:14px; font-weight:600; color:var(--ink-soft); }
+  .ticker-badge.placeholder{ background:#eef2f7; }
+  .ticker-badge.placeholder #tickerText{ color:var(--ink-soft); opacity:.75; }
+  .ticker-badge .tba{ font-size:11px; font-weight:700; color:#fff; background:var(--blue);
+    border:2px solid var(--ink); border-radius:999px; padding:2px 8px; }
+
+  .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    display:inline-flex; align-items:center; gap:9px;
+    padding:14px 24px; border:3px solid var(--ink); border-radius:16px;
+    font-family:inherit; font-weight:700; font-size:16px; cursor:pointer;
+    text-decoration:none; color:var(--ink); background:var(--card);
+    box-shadow:var(--shadow);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .btn:hover{ transform:translate(-2px,-2px); box-shadow:8px 8px 0 var(--ink); }
+  .btn:active{ transform:translate(3px,3px); box-shadow:3px 3px 0 var(--ink); }
+  .btn.primary{ background:linear-gradient(135deg,var(--green-2),var(--blue-2)); }
+  .btn.blue{ background:var(--blue-2); }
+
+  /* art frame */
+  .art-wrap{ position:relative; }
+  .art-frame{
+    position:relative;
+    border:4px solid var(--ink); border-radius:28px;
+    background:
+      repeating-linear-gradient(45deg, #fff 0 18px, var(--green-soft) 18px 36px);
+    box-shadow:10px 10px 0 var(--ink);
+    aspect-ratio:1/1; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    --rot:2deg;
+    transform:rotate(var(--rot));
+    cursor:pointer; user-select:none; -webkit-user-select:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .art-frame:hover{ transform:rotate(var(--rot)) scale(1.03); box-shadow:14px 14px 0 var(--ink); }
+  .art-frame.pop{ animation:pop .45s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes pop{
+    0%  { transform:rotate(var(--rot)) scale(1); }
+    45% { transform:rotate(var(--rot)) scale(1.09); }
+    100%{ transform:rotate(var(--rot)) scale(1); }
+  }
+
+  .tap-hint{
+    position:absolute; left:-14px; bottom:-16px; z-index:5;
+    display:inline-flex; align-items:center; gap:6px;
+    padding:9px 16px; border:3px solid var(--ink); border-radius:999px;
+    background:var(--green-2); color:var(--ink);
+    font-weight:700; font-size:15px; white-space:nowrap;
+    box-shadow:var(--shadow-sm); transform:rotate(-4deg);
+    animation:tapbob 1s ease-in-out infinite;
+    pointer-events:none; user-select:none;
+  }
+  @keyframes tapbob{
+    0%,100%{ transform:translateY(0) rotate(-4deg); }
+    50%    { transform:translateY(-9px) rotate(-4deg); }
+  }
+  .tap-hint.gone{
+    opacity:0; transform:scale(.5) rotate(-4deg);
+    transition:opacity .3s ease, transform .3s ease; animation:none;
+  }
+  .art-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .art-placeholder{
+    display:none;
+    flex-direction:column; gap:6px; text-align:center;
+    padding:24px; font-size:15px; color:var(--ink-soft); font-weight:600;
+  }
+  .art-placeholder code{
+    background:var(--ink); color:#fff; padding:2px 7px; border-radius:6px; font-size:13px;
+  }
+  .art-frame .corner{
+    position:absolute; top:10px; right:10px;
+    background:var(--blue); color:#fff; font-weight:700; font-size:12px;
+    padding:5px 10px; border:3px solid var(--ink); border-radius:999px;
+    transform:rotate(6deg);
+  }
+
+  /* ---------- section shell ---------- */
+  section.block{ padding:26px 0; }
+  .card{
+    background:var(--card);
+    border:3px solid var(--ink); border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:26px;
+  }
+  .card h2{
+    margin:0 0 6px; font-size:26px; font-weight:700;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .card h2 .pill{
+    font-size:12px; font-weight:700; color:#fff; background:var(--blue);
+    border:3px solid var(--ink); border-radius:999px; padding:3px 10px;
+  }
+  .card p.hint{ margin:0 0 18px; color:var(--ink-soft); font-size:15px; }
+  .card code{ background:#eef2f7; padding:2px 6px; border-radius:6px; font-size:13px; }
+
+  /* ---------- CA box ---------- */
+  .ca-box{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    background:var(--green-soft);
+    border:3px dashed var(--ink); border-radius:16px;
+    padding:14px 16px;
+  }
+  .ca-label{ font-weight:700; font-size:14px; letter-spacing:1px; }
+  .ca-value{
+    flex:1; min-width:200px;
+    font-family:'Courier New', ui-monospace, monospace;
+    font-weight:700; font-size:15px; word-break:break-all;
+    cursor:pointer; user-select:all;
+  }
+  #copyBtn{
+    padding:10px 18px; border:3px solid var(--ink); border-radius:12px;
+    background:var(--blue-2); font-family:inherit; font-weight:700; font-size:14px;
+    cursor:pointer; box-shadow:var(--shadow-sm); white-space:nowrap;
+    transition:transform .08s ease, box-shadow .08s ease, background .15s ease;
+  }
+  #copyBtn:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
+  #copyBtn:active{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
+  #copyBtn.done{ background:var(--green-2); }
+
+  /* ---------- chart ---------- */
+  .chart-shell{
+    position:relative;
+    height:520px; border:3px solid var(--ink); border-radius:16px;
+    overflow:hidden; background:#f1f5f9;
+  }
+  #dexFrame{ width:100%; height:100%; border:0; display:block; }
+  .chart-overlay{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; text-align:center; padding:24px;
+    background:repeating-linear-gradient(45deg,#fff 0 22px,var(--blue-soft) 22px 44px);
+  }
+  .chart-overlay .emoji{ font-size:40px; }
+  .chart-overlay h3{ margin:0; font-size:22px; }
+  .chart-overlay p{ margin:0; color:var(--ink-soft); font-size:14px; max-width:48ch; }
+  .chart-form{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .chart-form input{
+    padding:12px 14px; border:3px solid var(--ink); border-radius:12px;
+    font-family:inherit; font-size:14px; font-weight:600; min-width:min(420px,80vw);
+    background:#fff; color:var(--ink);
+  }
+  .chart-form input:focus{ outline:3px solid var(--blue); outline-offset:1px; }
+  .chart-change{
+    position:absolute; top:10px; right:10px; z-index:3;
+    padding:8px 14px; border:3px solid var(--ink); border-radius:999px;
+    background:var(--card); font-family:inherit; font-weight:700; font-size:13px;
+    cursor:pointer; box-shadow:var(--shadow-sm); display:none;
+  }
+
+  /* ---------- how to buy ---------- */
+  .steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .step{
+    background:var(--card); border:3px solid var(--ink); border-radius:16px;
+    padding:18px; box-shadow:var(--shadow-sm);
+  }
+  .step .n{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%;
+    background:var(--green-2); border:3px solid var(--ink);
+    font-weight:700; margin-bottom:10px;
+  }
+  .step h4{ margin:0 0 4px; font-size:17px; }
+  .step p{ margin:0; font-size:14px; color:var(--ink-soft); }
+
+  /* ---------- footer ---------- */
+  footer{
+    text-align:center; padding:44px 20px 120px; color:var(--ink-soft);
+    font-size:14px;
+  }
+  footer .brand{ justify-content:center; margin-bottom:8px; font-size:18px; }
+  footer .disc{ max-width:60ch; margin:6px auto 0; }
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(160%);
+    background:var(--ink); color:#fff; font-weight:700; font-size:14px;
+    padding:12px 22px; border-radius:999px; border:3px solid #fff;
+    box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:50;
+    transition:transform .25s cubic-bezier(.2,1.4,.5,1);
+  }
+  #toast.show{ transform:translateX(-50%) translateY(0); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .hero{ grid-template-columns:1fr; padding:34px 0 20px; }
+    .art-wrap{ max-width:420px; margin:0 auto; }
+    .art-frame{ --rot:0deg; }
+    .steps{ grid-template-columns:1fr; }
+    .chip.hide-sm{ display:none; }
+    .chart-shell{ height:440px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="star-bg" aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3L22 9.2l-5 4.7L18.2 21 12 17.4 5.8 21 7 13.9l-5-4.7 7.1-.9z"/></svg>
+</div>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="brand"><span class="dot"></span> PUPOE&nbsp;club</a>
+    <nav class="socials">
+      <a class="chip green" href="#" target="_blank" rel="noopener">𝕏 Twitter</a>
+      <a class="chip blue" href="#" target="_blank" rel="noopener">✈ Telegram</a>
+      <a class="chip hide-sm" id="gmgnNav" href="https://gmgn.ai/" target="_blank" rel="noopener">📈 GMGN</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <span class="kicker">⭐ meme token · <span id="netKicker">Robinhood</span></span>
+      <h1>PUPOE&nbsp;club</h1>
+      <p class="tagline">The comfiest little club on-chain. Thumbs up, big eyes, good vibes. Join the club.</p>
+
+      <div class="ticker-badge" id="tickerBadge">
+        <span class="lbl">TICKER</span>
+        <span id="tickerText">$</span>
+        <span class="tba" id="tickerTba">TBA</span>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn primary" id="buyBtn" href="https://gmgn.ai/" target="_blank" rel="noopener">🚀 Buy PUPOE</a>
+        <a class="btn blue" href="#chart">📊 Chart</a>
+        <button class="btn" id="copyBtnHero">📋 Copy CA</button>
+      </div>
+    </div>
+
+    <div class="art-wrap">
+      <div class="art-frame" id="artFrame">
+        <span class="corner">PUPOE</span>
+        <img id="art" src="art.png" alt="PUPOE club art"
+             onerror="this.style.display='none';document.getElementById('artPlaceholder').style.display='flex';">
+        <div class="art-placeholder" id="artPlaceholder">
+          <div>🖼️ Put your art here</div>
+          <div>drop <code>art.png</code> next to index.html</div>
+          <div>or change <code>src</code> on &lt;img id="art"&gt;</div>
+        </div>
+      </div>
+      <div class="tap-hint" id="tapHint">👆 click here</div>
+    </div>
+  </section>
+
+  <!-- CONTRACT -->
+  <section class="block" id="contract">
+    <div class="card">
+      <h2>Contract address <span class="pill">CA</span></h2>
+      <p class="hint">Always verify the CA before buying. Tap the address or the button to copy.</p>
+      <div class="ca-box">
+        <span class="ca-label">CA</span>
+        <span class="ca-value" id="caValue" title="Click to copy">loading…</span>
+        <button id="copyBtn">Copy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEX CHART -->
+  <section class="block" id="chart">
+    <div class="card">
+      <h2>DEX chart <span class="pill" id="chartPill">TBA</span></h2>
+      <p class="hint">Live price chart from a DEX aggregator — goes live when trading opens.</p>
+      <div class="chart-shell">
+        <iframe id="dexFrame" title="PUPOE DEX chart" loading="lazy"
+                allow="clipboard-write" referrerpolicy="no-referrer"></iframe>
+        <div class="chart-overlay" id="chartOverlay">
+          <div class="emoji">📈</div>
+          <h3>Chart coming soon</h3>
+          <p>Trading isn’t live yet. The DEX price chart will appear here once the pool is open.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO BUY -->
+  <section class="block">
+    <div class="card">
+      <h2>How to join the club</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="n">1</div>
+          <h4>Set up your wallet</h4>
+          <p>Get a wallet that supports the Robinhood network and back it up.</p>
+        </div>
+        <div class="step">
+          <div class="n">2</div>
+          <h4>Add funds</h4>
+          <p>Top up your wallet with the network’s base asset for swaps + gas.</p>
+        </div>
+        <div class="step">
+          <div class="n">3</div>
+          <h4>Buy PUPOE</h4>
+          <p>Copy the CA above, open the swap, paste it in and buy $PUPOE.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:60px"></div>
+
+</main>
+
+<div id="toast">Copied!</div>
+
+<script>
+  /* ============================================================
+     CONFIG — меняй здесь
+     ============================================================ */
+  const CONFIG = {
+    contractAddress: "TBA_PASTE_CONTRACT_ADDRESS_HERE",   // ← вставь CA
+    ticker: "",                                           // ← тикер (пусто = заглушка "$TBA")
+    network: "Robinhood",                                 // ← сеть
+    gmgnUrl: "",                                          // ← полная ссылка на токен в GMGN (пусто = gmgn.ai)
+    dexEmbedUrl: "",                                      // ← iframe-ссылка на DEX-график (пусто = заглушка)
+    soundUrl: "sound.mp3"                                 // ← звук по клику на картинку (пусто = встроенный «поп»)
+  };
+  /* ============================================================ */
+
+  const isPlaceholderCA = /TBA|PASTE|HERE/i.test(CONFIG.contractAddress) || !CONFIG.contractAddress;
+
+  // ---- network ----
+  document.getElementById('netKicker').textContent = CONFIG.network || 'Robinhood';
+
+  // ---- ticker (with placeholder) ----
+  const tickerBadge = document.getElementById('tickerBadge');
+  const tickerText  = document.getElementById('tickerText');
+  const tickerTba   = document.getElementById('tickerTba');
+  if (CONFIG.ticker && CONFIG.ticker.trim() && CONFIG.ticker.trim() !== '$'){
+    const t = CONFIG.ticker.trim();
+    tickerText.textContent = t.startsWith('$') ? t : '$' + t;
+    tickerTba.hidden = true;
+  } else {
+    tickerText.textContent = '$TBA';
+    tickerBadge.classList.add('placeholder');
+    tickerTba.hidden = true; // текст уже говорит TBA
+  }
+
+  // ---- CA ----
+  const caValue = document.getElementById('caValue');
+  caValue.textContent = isPlaceholderCA ? 'TBA — coming soon' : CONFIG.contractAddress;
+
+  // ---- GMGN links ----
+  const gmgnUrl = CONFIG.gmgnUrl && CONFIG.gmgnUrl.trim() ? CONFIG.gmgnUrl.trim() : 'https://gmgn.ai/';
+  document.getElementById('buyBtn').href = gmgnUrl;
+  document.getElementById('gmgnNav').href = gmgnUrl;
+
+  // ---- copy CA ----
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+  async function copyCA(){
+    if (isPlaceholderCA){ showToast('CA not set yet 🙃'); return; }
+    const text = CONFIG.contractAddress;
+    try{
+      await navigator.clipboard.writeText(text);
+    }catch(e){
+      const t = document.createElement('textarea');
+      t.value = text; t.style.position='fixed'; t.style.opacity='0';
+      document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); }catch(_){}
+      document.body.removeChild(t);
+    }
+    showToast('Contract copied ✔');
+    const b = document.getElementById('copyBtn');
+    b.textContent = 'Copied!'; b.classList.add('done');
+    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, 1500);
+  }
+  document.getElementById('copyBtn').addEventListener('click', copyCA);
+  document.getElementById('copyBtnHero').addEventListener('click', copyCA);
+  caValue.addEventListener('click', copyCA);
+
+  // ---- DEX chart ----
+  // Пока CONFIG.dexEmbedUrl пустой — показывается заглушка "Chart coming soon".
+  // Вставь iframe-ссылку в CONFIG.dexEmbedUrl, чтобы включить график.
+  const dexFrame  = document.getElementById('dexFrame');
+  const overlay   = document.getElementById('chartOverlay');
+  const chartPill = document.getElementById('chartPill');
+
+  const embedUrl = CONFIG.dexEmbedUrl && CONFIG.dexEmbedUrl.trim();
+  if (embedUrl && /^https?:\/\//i.test(embedUrl)){
+    dexFrame.src = embedUrl;
+    overlay.style.display = 'none';
+    chartPill.textContent = 'LIVE';
+  }
+
+  // ---- click the art: sound + pop + hide the "нажми сюда" hint ----
+  const artFrame = document.getElementById('artFrame');
+  const tapHint  = document.getElementById('tapHint');
+
+  let sfx = null;
+  if (CONFIG.soundUrl && CONFIG.soundUrl.trim()){
+    sfx = new Audio(CONFIG.soundUrl.trim());
+    sfx.preload = 'auto';
+  }
+  let audioCtx;
+  function synthPop(){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const t = audioCtx.currentTime;
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(300, t);
+      o.frequency.exponentialRampToValueAtTime(820, t + 0.10);
+      o.frequency.exponentialRampToValueAtTime(170, t + 0.28);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.30);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(t); o.stop(t + 0.32);
+    }catch(e){}
+  }
+  function playPop(){
+    if (sfx){
+      try{
+        sfx.currentTime = 0;
+        const p = sfx.play();
+        if (p && p.catch) p.catch(() => synthPop());
+        return;
+      }catch(e){}
+    }
+    synthPop();
+  }
+
+  artFrame.addEventListener('click', () => {
+    playPop();
+    artFrame.classList.remove('pop');
+    void artFrame.offsetWidth;      // перезапуск анимации
+    artFrame.classList.add('pop');
+    if (tapHint) tapHint.classList.add('gone');
+  });
+</script>
+</body>
+</html>
