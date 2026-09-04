@@ -24,7 +24,8 @@
                        (или поменяй src у <img id="art">).
   7. soundUrl        — звук по клику на картинку (напр. "pop.mp3" рядом
                        с index.html). Пусто = играет встроенный «поп».
-  8. Соцсети         — замени href="#" в шапке на свои ссылки.
+  8. Соцсети         — twitterUrl / telegramUrl в CONFIG. Пусто = кнопка
+                       становится заглушкой (тост «coming soon» по клику).
   ============================================================
 -->
 
@@ -100,10 +101,9 @@
     font-weight:700; font-size:22px; letter-spacing:.5px;
     text-decoration:none; color:var(--ink);
   }
-  .brand .dot{
-    width:26px; height:26px; border-radius:50%;
-    background:linear-gradient(135deg,var(--green),var(--blue));
-    border:3px solid var(--ink);
+  .brand-icon{
+    width:30px; height:30px; object-fit:contain;
+    display:block; flex:0 0 auto;
   }
   .socials{ display:flex; gap:10px; flex-wrap:wrap; }
   .chip{
@@ -118,6 +118,14 @@
   .chip:active{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
   .chip.green{ background:var(--green-2); }
   .chip.blue { background:var(--blue-2); }
+  .chip svg{ width:17px; height:17px; display:block; flex:0 0 auto; }
+  .chip img{ width:17px; height:17px; object-fit:contain; border-radius:4px; display:block; flex:0 0 auto; }
+
+  .chip.disabled, .btn.disabled{
+    opacity:.5; filter:grayscale(.4); cursor:not-allowed;
+  }
+  .chip.disabled:hover{ transform:none; box-shadow:var(--shadow-sm); }
+  .btn.disabled:hover{ transform:none; box-shadow:var(--shadow); }
 
   /* ---------- hero ---------- */
   .hero{
@@ -130,6 +138,7 @@
     background:var(--card); font-weight:600; font-size:14px;
     box-shadow:var(--shadow-sm);
   }
+  .kicker-icon{ width:18px; height:18px; object-fit:contain; display:block; flex:0 0 auto; }
   h1{
     margin:16px 0 10px;
     font-size:clamp(44px, 8vw, 84px);
@@ -149,10 +158,10 @@
     font-weight:700; font-size:20px; margin-bottom:22px;
   }
   .ticker-badge span.lbl{ font-size:14px; font-weight:600; color:var(--ink-soft); }
-  .ticker-badge.placeholder{ background:#eef2f7; }
-  .ticker-badge.placeholder #tickerText{ color:var(--ink-soft); opacity:.75; }
-  .ticker-badge .tba{ font-size:11px; font-weight:700; color:#fff; background:var(--blue);
-    border:2px solid var(--ink); border-radius:999px; padding:2px 8px; }
+  .ticker-badge.placeholder{ background:#eef2f7; border-style:dashed; }
+  .ticker-badge.placeholder #tickerText{ color:var(--ink-soft); opacity:.65; letter-spacing:2px; }
+  .ticker-badge .soon{ font-size:11px; font-weight:700; color:var(--ink-soft);
+    border:2px dashed var(--ink-soft); border-radius:999px; padding:2px 9px; }
 
   .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
   .btn{
@@ -167,6 +176,7 @@
   .btn:active{ transform:translate(3px,3px); box-shadow:3px 3px 0 var(--ink); }
   .btn.primary{ background:linear-gradient(135deg,var(--green-2),var(--blue-2)); }
   .btn.blue{ background:var(--blue-2); }
+  .btn svg{ width:18px; height:18px; flex:0 0 auto; }
 
   /* art frame */
   .art-wrap{ position:relative; }
@@ -259,11 +269,13 @@
     cursor:pointer; user-select:all;
   }
   #copyBtn{
+    display:inline-flex; align-items:center; gap:7px;
     padding:10px 18px; border:3px solid var(--ink); border-radius:12px;
     background:var(--blue-2); font-family:inherit; font-weight:700; font-size:14px;
     cursor:pointer; box-shadow:var(--shadow-sm); white-space:nowrap;
     transition:transform .08s ease, box-shadow .08s ease, background .15s ease;
   }
+  #copyBtn svg{ width:15px; height:15px; flex:0 0 auto; }
   #copyBtn:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
   #copyBtn:active{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
   #copyBtn.done{ background:var(--green-2); }
@@ -355,11 +367,17 @@
 
 <header>
   <div class="wrap nav">
-    <a href="#top" class="brand"><span class="dot"></span> PUPOE&nbsp;club</a>
+    <a href="#top" class="brand"><img src="aaaaaa.png" alt="" class="brand-icon"> PUPOE&nbsp;club</a>
     <nav class="socials">
-      <a class="chip green" href="#" target="_blank" rel="noopener">𝕏 Twitter</a>
-      <a class="chip blue" href="#" target="_blank" rel="noopener">✈ Telegram</a>
-      <a class="chip hide-sm" id="gmgnNav" href="https://gmgn.ai/" target="_blank" rel="noopener">📈 GMGN</a>
+      <a class="chip green" id="twitterNav" href="#" target="_blank" rel="noopener">𝕏 Twitter</a>
+      <a class="chip blue" id="tgNav" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+        Telegram
+      </a>
+      <a class="chip hide-sm" id="gmgnNav" href="#" target="_blank" rel="noopener">
+        <img src="gmgnlogo.png" alt="" onerror="this.style.display='none'">
+        GMGN
+      </a>
     </nav>
   </div>
 </header>
@@ -369,20 +387,29 @@
   <!-- HERO -->
   <section class="hero">
     <div>
-      <span class="kicker">⭐ meme token · <span id="netKicker">Robinhood</span></span>
+      <span class="kicker"><img src="aaaaaa.png" alt="" class="kicker-icon"> meme token · <span id="netKicker">Robinhood</span></span>
       <h1>PUPOE&nbsp;club</h1>
       <p class="tagline">The comfiest little club on-chain. Thumbs up, big eyes, good vibes. Join the club.</p>
 
       <div class="ticker-badge" id="tickerBadge">
         <span class="lbl">TICKER</span>
         <span id="tickerText">$</span>
-        <span class="tba" id="tickerTba">TBA</span>
+        <span class="soon" id="tickerSoon" hidden>reveal at launch</span>
       </div>
 
       <div class="cta-row">
-        <a class="btn primary" id="buyBtn" href="https://gmgn.ai/" target="_blank" rel="noopener">🚀 Buy PUPOE</a>
-        <a class="btn blue" href="#chart">📊 Chart</a>
-        <button class="btn" id="copyBtnHero">📋 Copy CA</button>
+        <a class="btn primary" id="buyBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+          Buy PUPOE
+        </a>
+        <a class="btn blue" href="#chart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Chart
+        </a>
+        <button class="btn" id="copyBtnHero">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy CA
+        </button>
       </div>
     </div>
 
@@ -409,7 +436,10 @@
       <div class="ca-box">
         <span class="ca-label">CA</span>
         <span class="ca-value" id="caValue" title="Click to copy">loading…</span>
-        <button id="copyBtn">Copy</button>
+        <button id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="copyBtnLabel">Copy</span>
+        </button>
       </div>
     </div>
   </section>
@@ -449,7 +479,7 @@
         <div class="step">
           <div class="n">3</div>
           <h4>Buy PUPOE</h4>
-          <p>Copy the CA above, open the swap, paste it in and buy $PUPOE.</p>
+          <p>Copy the CA above, open the swap, paste it in and buy PUPOE.</p>
         </div>
       </div>
     </div>
@@ -467,9 +497,11 @@
      ============================================================ */
   const CONFIG = {
     contractAddress: "TBA_PASTE_CONTRACT_ADDRESS_HERE",   // ← вставь CA
-    ticker: "",                                           // ← тикер (пусто = заглушка "$TBA")
+    ticker: "",                                           // ← тикер (пусто = заглушка "$????")
     network: "Robinhood",                                 // ← сеть
-    gmgnUrl: "",                                          // ← полная ссылка на токен в GMGN (пусто = gmgn.ai)
+    twitterUrl: "https://x.com/pupoeclub",                // ← ссылка на X/Twitter
+    telegramUrl: "",                                      // ← ссылка на Telegram (пусто = заглушка)
+    gmgnUrl: "",                                          // ← полная ссылка на токен в GMGN (пусто = заглушка)
     dexEmbedUrl: "",                                      // ← iframe-ссылка на DEX-график (пусто = заглушка)
     soundUrl: "sound.mp3"                                 // ← звук по клику на картинку (пусто = встроенный «поп»)
   };
@@ -483,25 +515,19 @@
   // ---- ticker (with placeholder) ----
   const tickerBadge = document.getElementById('tickerBadge');
   const tickerText  = document.getElementById('tickerText');
-  const tickerTba   = document.getElementById('tickerTba');
+  const tickerSoon  = document.getElementById('tickerSoon');
   if (CONFIG.ticker && CONFIG.ticker.trim() && CONFIG.ticker.trim() !== '$'){
     const t = CONFIG.ticker.trim();
     tickerText.textContent = t.startsWith('$') ? t : '$' + t;
-    tickerTba.hidden = true;
   } else {
-    tickerText.textContent = '$TBA';
+    tickerText.textContent = '$????';        // явная заглушка, а не похожий на реальный тикер "$TBA"
     tickerBadge.classList.add('placeholder');
-    tickerTba.hidden = true; // текст уже говорит TBA
+    tickerSoon.hidden = false;
   }
 
   // ---- CA ----
   const caValue = document.getElementById('caValue');
   caValue.textContent = isPlaceholderCA ? 'TBA — coming soon' : CONFIG.contractAddress;
-
-  // ---- GMGN links ----
-  const gmgnUrl = CONFIG.gmgnUrl && CONFIG.gmgnUrl.trim() ? CONFIG.gmgnUrl.trim() : 'https://gmgn.ai/';
-  document.getElementById('buyBtn').href = gmgnUrl;
-  document.getElementById('gmgnNav').href = gmgnUrl;
 
   // ---- copy CA ----
   const toast = document.getElementById('toast');
@@ -512,6 +538,27 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
   }
+
+  // ---- outbound links: real link if set, otherwise a "coming soon" placeholder ----
+  function wireLink(id, url, label){
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url && url.trim()){
+      el.href = url.trim();
+    } else {
+      el.href = '#';
+      el.classList.add('disabled');
+      el.setAttribute('aria-disabled', 'true');
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast(label + ' — coming soon');
+      });
+    }
+  }
+  wireLink('twitterNav', CONFIG.twitterUrl, 'Twitter');
+  wireLink('tgNav', CONFIG.telegramUrl, 'Telegram');
+  wireLink('gmgnNav', CONFIG.gmgnUrl, 'GMGN');
+  wireLink('buyBtn', CONFIG.gmgnUrl, 'GMGN');
   async function copyCA(){
     if (isPlaceholderCA){ showToast('CA not set yet 🙃'); return; }
     const text = CONFIG.contractAddress;
@@ -526,8 +573,9 @@
     }
     showToast('Contract copied ✔');
     const b = document.getElementById('copyBtn');
-    b.textContent = 'Copied!'; b.classList.add('done');
-    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('done'); }, 1500);
+    const label = document.getElementById('copyBtnLabel');
+    label.textContent = 'Copied!'; b.classList.add('done');
+    setTimeout(() => { label.textContent = 'Copy'; b.classList.remove('done'); }, 1500);
   }
   document.getElementById('copyBtn').addEventListener('click', copyCA);
   document.getElementById('copyBtnHero').addEventListener('click', copyCA);
